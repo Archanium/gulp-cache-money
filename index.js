@@ -110,7 +110,11 @@ function Cached(options) {
             var fileStream = through();
 
             // Pipe in the contents
-            file.pipe(fileStream);
+            if ( file.isStream() ) {
+                file.contents.pipe( fileStream );
+            } else if ( file.isBuffer() ) {
+                fileStream.end( file.contents );
+            }
 
             // Test if the file has changed (sha regardless)
             changed(file.path, fileStream, function(err, changed) {
